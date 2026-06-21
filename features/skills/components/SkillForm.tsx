@@ -9,12 +9,13 @@ import { useRouter } from "next/navigation";
 import { createSkillAction, updateSkillAction, SkillPayload } from "../actions";
 import Link from "next/link";
 
+// 1. SKEMA ZOD: Hapus .default(0) dari sort_order
 const skillSchema = z.object({
   id: z.string().optional(),
   skill_name: z.string().min(1, "Nama keahlian utama wajib diisi"),
   category: z.string().min(1, "Kategori wajib diisi"),
-  technical_string: z.string().min(2, "Isi minimal 1 teknik spesifik"), // Validasi string form
-  sort_order: z.number().int("Harus berupa angka").default(0),
+  technical_string: z.string().min(2, "Isi minimal 1 teknik spesifik"),
+  sort_order: z.number().int("Harus berupa angka"),
 });
 
 type FormValues = z.infer<typeof skillSchema>;
@@ -34,15 +35,12 @@ export default function SkillForm({ initialData, isEdit = false }: Props) {
     text: string;
   } | null>(null);
 
-  // Jika Edit, gabungkan array dari DB dengan enter (\n)
-  // const defaultTechnical = initialData?.technical
-  //   ? initialData.technical.join("\n")
-  //   : "";
   // Mengecek secara aman apakah data benar-benar Array sebelum di-join
   const defaultTechnical = Array.isArray(initialData?.technical)
     ? initialData.technical.join("\n")
     : "";
 
+  // 2. USEFORM: Lengkapi defaultValues agar RHF tidak bingung
   const {
     register,
     handleSubmit,
@@ -51,23 +49,27 @@ export default function SkillForm({ initialData, isEdit = false }: Props) {
     resolver: zodResolver(skillSchema),
     defaultValues: initialData
       ? { ...initialData, technical_string: defaultTechnical }
-      : { sort_order: 0, technical_string: "" },
+      : {
+          skill_name: "",
+          category: "",
+          technical_string: "",
+          sort_order: 0,
+        },
   });
 
   const onSubmit = async (data: FormValues) => {
     setSubmitMessage(null);
 
-    // Mengubah teks yang dipisah enter menjadi Array
     const techArray = data.technical_string
       .split("\n")
       .map((item) => item.trim())
-      .filter((item) => item !== "" && item !== "-"); // Menghapus baris kosong atau tanda strip
+      .filter((item) => item !== "" && item !== "-");
 
     const payload: SkillPayload = {
       id: data.id,
       skill_name: data.skill_name,
       category: data.category,
-      technical: techArray, // Kirim sebagai Array
+      technical: techArray,
       sort_order: data.sort_order,
     };
 
@@ -144,11 +146,17 @@ export default function SkillForm({ initialData, isEdit = false }: Props) {
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Sort Order (Urutan Tampil)
               </label>
+              {/* 3. Pastikan valueAsNumber: true ada di sini */}
               <input
                 type="number"
                 {...register("sort_order", { valueAsNumber: true })}
                 className={inputClasses}
               />
+              {errors.sort_order && (
+                <p className="text-red-500 text-xs mt-1">
+                  {errors.sort_order.message}
+                </p>
+              )}
             </div>
           </div>
 

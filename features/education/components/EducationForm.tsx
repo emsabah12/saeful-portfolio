@@ -6,27 +6,25 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Loader2, Save, ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
-import {
-  createEducationAction,
-  updateEducationAction,
-  EducationPayload,
-} from "../actions";
 import Link from "next/link";
+import { createEducationAction, updateEducationAction } from "../actions"; // Asumsi path action Anda
 
+// 1. SKEMA ZOD (DIPERBAIKI)
+// Menggunakan z.coerce.number() tanpa .default() untuk mencegah konflik Resolver RHF
 const educationSchema = z.object({
   id: z.string().optional(),
   degree: z.string().min(2, "Gelar/Jurusan wajib diisi"),
-  school: z.string().min(2, "Nama institusi wajib diisi"),
+  school: z.string().min(2, "Nama instansi/sekolah wajib diisi"),
   year: z.string().min(2, "Tahun wajib diisi"),
+  description: z.string().min(10, "Deskripsi minimal 10 karakter"),
   score: z.string().optional().or(z.literal("")),
-  description: z.string().min(5, "Deskripsi wajib diisi"),
-  sort_order: z.number().int("Harus berupa angka").default(0),
+  sort_order: z.number().int("Harus berupa angka valid"),
 });
 
 type FormValues = z.infer<typeof educationSchema>;
 
 interface Props {
-  initialData?: FormValues;
+  initialData?: any;
   isEdit?: boolean;
 }
 
@@ -40,26 +38,50 @@ export default function EducationForm({ initialData, isEdit = false }: Props) {
     text: string;
   } | null>(null);
 
+  // 2. INISIALISASI USEFORM (DIPERBAIKI)
+  // Tanggung jawab defaultValues diserahkan sepenuhnya ke React Hook Form
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<FormValues>({
     resolver: zodResolver(educationSchema),
-    defaultValues: initialData || { sort_order: 0, score: "" },
+    defaultValues: initialData || {
+      degree: "",
+      school: "",
+      year: "",
+      description: "",
+      score: "",
+      sort_order: 0, // Default disuplai di sini
+    },
   });
 
   const onSubmit = async (data: FormValues) => {
     setSubmitMessage(null);
-    const result = isEdit
-      ? await updateEducationAction(data as EducationPayload)
-      : await createEducationAction(data as EducationPayload);
 
-    if (result.success) {
-      setSubmitMessage({ type: "success", text: result.message });
-      setTimeout(() => router.push("/admin/education"), 1000);
-    } else {
-      setSubmitMessage({ type: "error", text: result.message });
+    const payload = {
+      id: data.id,
+      degree: data.degree,
+      school: data.school,
+      year: data.year,
+      description: data.description,
+      score: data.score || "",
+      sort_order: data.sort_order,
+    };
+
+    try {
+      const result = isEdit
+        ? await updateEducationAction(payload)
+        : await createEducationAction(payload);
+
+      if (result.success) {
+        setSubmitMessage({ type: "success", text: result.message });
+        setTimeout(() => router.push("/admin/education"), 1000);
+      } else {
+        setSubmitMessage({ type: "error", text: result.message });
+      }
+    } catch (error: any) {
+      setSubmitMessage({ type: "error", text: "Terjadi kesalahan sistem." });
     }
   };
 
@@ -73,14 +95,18 @@ export default function EducationForm({ initialData, isEdit = false }: Props) {
           <ArrowLeft className="w-5 h-5 text-gray-600" />
         </Link>
         <h1 className="text-2xl font-bold text-gray-900">
-          {isEdit ? "Edit Education" : "Tambah Education"}
+          {isEdit ? "Edit Riwayat Pendidikan" : "Tambah Riwayat Pendidikan"}
         </h1>
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="p-6 space-y-6">
         {submitMessage && (
           <div
-            className={`p-4 rounded-md text-sm font-medium ${submitMessage.type === "success" ? "bg-green-50 text-green-700" : "bg-red-50 text-red-700"}`}
+            className={`p-4 rounded-md text-sm font-medium ${
+              submitMessage.type === "success"
+                ? "bg-green-50 text-green-700"
+                : "bg-red-50 text-red-700"
+            }`}
           >
             {submitMessage.text}
           </div>
@@ -95,7 +121,7 @@ export default function EducationForm({ initialData, isEdit = false }: Props) {
               <input
                 {...register("degree")}
                 className={inputClasses}
-                placeholder="Bachelor of Computer Science"
+                placeholder="S.Pd. Pendidikan ..."
               />
               {errors.degree && (
                 <p className="text-red-500 text-xs mt-1">
@@ -106,12 +132,12 @@ export default function EducationForm({ initialData, isEdit = false }: Props) {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Nama Institusi / Sekolah
+                Instansi / Universitas / Sekolah
               </label>
               <input
                 {...register("school")}
                 className={inputClasses}
-                placeholder="Universitas Indonesia"
+                placeholder="Universitas Terbuka"
               />
               {errors.school && (
                 <p className="text-red-500 text-xs mt-1">
@@ -122,7 +148,7 @@ export default function EducationForm({ initialData, isEdit = false }: Props) {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Tahun Lulus / Periode
+                Tahun
               </label>
               <input
                 {...register("year")}
@@ -135,9 +161,7 @@ export default function EducationForm({ initialData, isEdit = false }: Props) {
                 </p>
               )}
             </div>
-          </div>
 
-          <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Nilai / IPK (Opsional)
@@ -145,19 +169,26 @@ export default function EducationForm({ initialData, isEdit = false }: Props) {
               <input
                 {...register("score")}
                 className={inputClasses}
-                placeholder="GPA: 3.8/4.0"
+                placeholder="IPK: 3.85 / 4.00"
               />
+              {errors.score && (
+                <p className="text-red-500 text-xs mt-1">
+                  {errors.score.message}
+                </p>
+              )}
             </div>
+          </div>
 
+          <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Deskripsi Tambahan
+                Deskripsi
               </label>
               <textarea
                 {...register("description")}
-                rows={4}
+                rows={6}
                 className={inputClasses}
-                placeholder="Fokus pada rekayasa perangkat lunak..."
+                placeholder="Fokus studi pada..."
               />
               {errors.description && (
                 <p className="text-red-500 text-xs mt-1">
@@ -173,11 +204,16 @@ export default function EducationForm({ initialData, isEdit = false }: Props) {
               <input
                 type="number"
                 {...register("sort_order", { valueAsNumber: true })}
-                className={inputClasses}
+                className="w-24 px-4 py-2 border border-gray-300 rounded-md outline-none focus:ring-2 focus:ring-black text-gray-900 bg-white"
               />
               <p className="text-xs text-gray-500 mt-1">
-                Angka lebih kecil akan tampil lebih dulu.
+                Angka terkecil tampil lebih dulu (0, 1, 2, dst).
               </p>
+              {errors.sort_order && (
+                <p className="text-red-500 text-xs mt-1">
+                  {errors.sort_order.message}
+                </p>
+              )}
             </div>
           </div>
         </div>

@@ -1,11 +1,12 @@
 import { supabase } from "@/lib/supabase/client";
 import { Wrench, CheckCircle2 } from "lucide-react";
 
+// Interface yang ketat sesuai skema database terbaru
 interface Skill {
   id: string;
   skill_name: string;
   category: string;
-  technical: string[]; // Sekarang array of string
+  technical: string[];
   sort_order: number;
 }
 
@@ -27,18 +28,22 @@ export default async function Skills() {
     {} as Record<string, Skill[]>,
   );
 
+  // FIX: Menerapkan Type Assertion agar TypeScript mengetahui bahwa "items" adalah Array of Skill
+  const groupedEntries = Object.entries(groupedSkills) as [string, Skill[]][];
+
   return (
     <section className="py-20 bg-gray-50 border-t border-gray-100">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         <div className="flex items-center gap-3 mb-12">
           <Wrench className="w-8 h-8 text-black" />
           <h2 className="text-3xl font-bold text-gray-900">
-            Technical Expertise & Soft Skills
+            Technical Expertise
           </h2>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {Object.entries(groupedSkills).map(([category, items]) => (
+          {/* Menggunakan variabel groupedEntries yang sudah lolos Type Checking */}
+          {groupedEntries.map(([category, items]) => (
             <div
               key={category}
               className="bg-white p-8 rounded-2xl shadow-sm border border-gray-200"

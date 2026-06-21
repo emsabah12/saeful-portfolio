@@ -11,12 +11,11 @@ import {
   updateProjectAction,
   ProjectPayload,
 } from "../actions";
-// 1. IMPORT YANG HILANG DITAMBAHKAN DI SINI:
 import { uploadImageAction } from "@/features/upload/actions";
 import Link from "next/link";
 import Image from "next/image";
 
-// Skema Form
+// 1. SKEMA ZOD: Hapus .default() dari featured dan sort_order
 const projectSchema = z.object({
   id: z.string().optional(),
   title: z.string().min(2, "Judul wajib diisi"),
@@ -25,8 +24,8 @@ const projectSchema = z.object({
   image_path: z.string().min(1, "Path gambar wajib diisi"),
   period: z.string().min(2, "Periode wajib diisi"),
   link: z.string().url("Format URL tidak valid").optional().or(z.literal("")),
-  featured: z.boolean().default(false),
-  sort_order: z.number().int("Harus angka").default(0),
+  featured: z.boolean(), // <-- Dihapus .default(false)
+  sort_order: z.number().int("Harus angka"), // <-- Dihapus .default(0)
 });
 
 type FormValues = z.infer<typeof projectSchema>;
@@ -52,6 +51,7 @@ export default function ProjectForm({ initialData, isEdit = false }: Props) {
     ? initialData.tech_stack.join(", ")
     : "";
 
+  // 2. USEFORM: defaultValues disuplai lengkap
   const {
     register,
     handleSubmit,
@@ -66,18 +66,27 @@ export default function ProjectForm({ initialData, isEdit = false }: Props) {
           tech_stack_string: defaultTechStack,
           link: initialData.link || "",
         }
-      : { sort_order: 0, featured: false, link: "", image_path: "" },
+      : {
+          title: "",
+          description: "",
+          period: "",
+          tech_stack_string: "",
+          sort_order: 0,
+          featured: false,
+          link: "",
+          image_path: "",
+        },
   });
 
   const currentImagePath = watch("image_path");
 
-  // 2. FUNGSI UPLOAD YANG SUDAH DIPERBAIKI MENGGUNAKAN TRY-CATCH
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
     if (file.size > 2 * 1024 * 1024) {
       alert("Ukuran file terlalu besar. Maksimal 2MB.");
+      e.target.value = "";
       return;
     }
 
@@ -87,7 +96,6 @@ export default function ProjectForm({ initialData, isEdit = false }: Props) {
     try {
       const formData = new FormData();
       formData.append("file", file);
-      // Diperbaiki: Server Action mencari key "folder", bukan "portfolio_images"
       formData.append("folder", "db_portfolio");
 
       const result = await uploadImageAction(formData);
@@ -110,8 +118,8 @@ export default function ProjectForm({ initialData, isEdit = false }: Props) {
         text: "Terjadi kesalahan sistem saat unggah gambar.",
       });
     } finally {
-      // Pasti dieksekusi meskipun sukses atau error
       setIsUploading(false);
+      e.target.value = "";
     }
   };
 
@@ -305,6 +313,7 @@ export default function ProjectForm({ initialData, isEdit = false }: Props) {
                 </label>
                 <input
                   type="number"
+                  // 3. Pastikan valueAsNumber: true ada di sini
                   {...register("sort_order", { valueAsNumber: true })}
                   className="w-24 px-4 py-2 border border-gray-300 rounded-md outline-none focus:ring-2 focus:ring-black text-gray-900 bg-white"
                 />
@@ -314,6 +323,7 @@ export default function ProjectForm({ initialData, isEdit = false }: Props) {
                 <input
                   type="checkbox"
                   id="featured"
+                  // 4. Input checkbox native HTML dengan RHF
                   {...register("featured")}
                   className="w-5 h-5 text-black border-gray-300 rounded focus:ring-black"
                 />
