@@ -18,6 +18,12 @@ export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const pathname = usePathname(); // Untuk mendeteksi halaman aktif
 
+  // TAMBAHKAN KODE INI:
+  // Jika URL mengarah ke admin atau halaman login, kembalikan null (sembunyikan Navbar)
+  if (pathname.startsWith("/admin") || pathname === "/login") {
+    return null;
+  }
+
   // Deteksi event scroll untuk efek melayang & mengecil
   useEffect(() => {
     const handleScroll = () => {

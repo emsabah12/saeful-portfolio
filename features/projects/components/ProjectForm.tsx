@@ -14,6 +14,7 @@ import {
 import { uploadImageAction } from "@/features/upload/actions";
 import Link from "next/link";
 import Image from "next/image";
+import RichTextEditor from "@/components/admin/RichTextEditor";
 
 // 1. SKEMA ZOD: Hapus .default() dari featured dan sort_order
 const projectSchema = z.object({
@@ -253,11 +254,18 @@ export default function ProjectForm({ initialData, isEdit = false }: Props) {
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Deskripsi Singkat
               </label>
-              <textarea
+              {/* <textarea
                 {...register("description")}
                 rows={4}
                 className={inputClasses}
                 placeholder="Project ini bertujuan untuk..."
+              /> */}
+              {/* Menggunakan nilai dari watch() dan setValue() bawaan react-hook-form */}
+              <RichTextEditor
+                content={watch("description") || ""}
+                onChange={(htmlValue) =>
+                  setValue("description", htmlValue, { shouldValidate: true })
+                }
               />
               {errors.description && (
                 <p className="text-red-500 text-xs mt-1">

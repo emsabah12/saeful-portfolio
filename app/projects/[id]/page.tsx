@@ -113,9 +113,21 @@ export default async function ProjectDetailPage({ params }: PageProps) {
               Tentang Project
             </h3>
             {/* Class whitespace-pre-wrap sangat penting di sini. */}
-            <p className="text-gray-600 text-lg leading-relaxed whitespace-pre-wrap">
+            {/* <p className="text-gray-600 text-lg leading-relaxed whitespace-pre-wrap">
               {project.description}
-            </p>
+            </p> */}
+            {/* KANAN: Deskripsi Lengkap */}
+            <div className="md:col-span-2">
+              <h3 className="text-2xl font-bold text-gray-900 mb-6">
+                Tentang Project
+              </h3>
+
+              {/* PERBAIKAN: Gunakan dangerouslySetInnerHTML dan kelas prose */}
+              <div
+                className="prose prose-lg max-w-none text-gray-600 leading-relaxed"
+                dangerouslySetInnerHTML={{ __html: project.description }}
+              />
+            </div>
           </div>
         </div>
       </div>

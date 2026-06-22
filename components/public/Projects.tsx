@@ -1,7 +1,6 @@
 import { supabase } from "@/lib/supabase/client";
 import { ArrowRight, ExternalLink } from "lucide-react";
 import Link from "next/link";
-import Image from "next/image";
 
 interface Project {
   id: string;
@@ -14,13 +13,13 @@ interface Project {
 }
 
 export default async function FeaturedProjects() {
-  // 1. QUERY SUPABASE: Hanya ambil yang featured, urutkan, dan batasi 3 data
+  // QUERY SUPABASE: Hanya ambil yang featured, urutkan, dan batasi 3 data
   const { data: projects, error } = await supabase
     .from("projects")
     .select("*")
-    .eq("featured", true) // Wajib dicentang "Featured" di CMS
+    .eq("featured", true)
     .order("sort_order", { ascending: true })
-    .limit(3); // Maksimal 3 kolom
+    .limit(3);
 
   if (error || !projects || projects.length === 0) return null;
 
@@ -48,30 +47,37 @@ export default async function FeaturedProjects() {
           </Link>
         </div>
 
-        {/* 2. GRID LAYOUT: 1 Kolom di HP, 2 di Tablet, 3 di Desktop */}
+        {/* GRID LAYOUT DAFTAR PROJECT (Desain disamakan dengan All Projects) */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {projects.map((project: Project) => (
             <div
               key={project.id}
-              className="bg-white rounded-2xl overflow-hidden border border-gray-200 shadow-sm hover:shadow-lg transition-all duration-300 group flex flex-col"
+              className="bg-white rounded-2xl overflow-hidden border border-gray-200 shadow-sm hover:shadow-xl transition-all duration-300 group flex flex-col"
             >
-              {/* Image Container */}
-              <div className="relative w-full h-56 bg-gray-100 overflow-hidden">
+              {/* Image Container - Mengarah ke Detail Project */}
+              <Link
+                href={`/projects/${project.id}`}
+                className="relative w-full h-60 bg-gray-100 overflow-hidden block"
+              >
                 <img
                   src={project.image_path}
                   alt={project.title}
-                  className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500"
+                  className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-700 ease-in-out"
                 />
-              </div>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              </Link>
 
               {/* Content Container */}
               <div className="p-6 flex flex-col flex-grow">
-                <div className="flex justify-between items-start mb-4">
+                <div className="flex justify-between items-start mb-4 gap-4">
                   <div>
-                    <h3 className="text-xl font-bold text-gray-900 line-clamp-1">
-                      {project.title}
-                    </h3>
-                    <p className="text-sm text-gray-500 mt-1">
+                    {/* Title - Mengarah ke Detail Project */}
+                    <Link href={`/projects/${project.id}`}>
+                      <h3 className="text-xl font-bold text-gray-900 leading-tight mb-1 hover:text-blue-600 transition-colors">
+                        {project.title}
+                      </h3>
+                    </Link>
+                    <p className="text-sm font-medium text-gray-500">
                       {project.period}
                     </p>
                   </div>
@@ -80,32 +86,44 @@ export default async function FeaturedProjects() {
                       href={project.link}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="p-2 bg-gray-50 rounded-full hover:bg-black hover:text-white transition-colors"
+                      className="p-2.5 bg-gray-50 rounded-full text-gray-600 hover:bg-black hover:text-white transition-all shrink-0"
+                      title="Kunjungi Project (External Link)"
                     >
                       <ExternalLink className="w-4 h-4" />
                     </a>
                   )}
                 </div>
 
-                <p className="text-gray-600 text-sm mb-6 line-clamp-3">
+                {/* Deskripsi: Dibatasi maksimal 3 baris menggunakan line-clamp-3 */}
+                <p className="text-gray-600 text-sm mb-6 leading-relaxed line-clamp-3">
                   {project.description}
                 </p>
 
-                {/* Tech Stack - Ditaruh di bawah menggunakan mt-auto agar sejajar */}
-                <div className="mt-auto flex flex-wrap gap-2">
-                  {project.tech_stack?.slice(0, 3).map((tech, idx) => (
-                    <span
-                      key={idx}
-                      className="px-3 py-1 bg-gray-100 text-gray-700 text-xs font-medium rounded-full"
-                    >
-                      {tech}
-                    </span>
-                  ))}
-                  {project.tech_stack?.length > 3 && (
-                    <span className="px-3 py-1 bg-gray-50 text-gray-500 text-xs font-medium rounded-full">
-                      +{project.tech_stack.length - 3}
-                    </span>
-                  )}
+                {/* Tech Stack & Tombol Detail di posisi bawah (mt-auto) */}
+                <div className="mt-auto pt-4 border-t border-gray-100 flex flex-col gap-4">
+                  <div className="flex flex-wrap gap-2">
+                    {project.tech_stack?.slice(0, 3).map((tech, idx) => (
+                      <span
+                        key={idx}
+                        className="px-3 py-1 bg-gray-50 text-gray-600 text-xs font-medium rounded-md border border-gray-200"
+                      >
+                        {tech}
+                      </span>
+                    ))}
+                    {project.tech_stack?.length > 3 && (
+                      <span className="px-3 py-1 bg-gray-50 text-gray-400 text-xs font-medium rounded-md border border-gray-200">
+                        +{project.tech_stack.length - 3}
+                      </span>
+                    )}
+                  </div>
+
+                  <Link
+                    href={`/projects/${project.id}`}
+                    className="text-sm font-semibold text-black flex items-center gap-1 group/link hover:text-blue-600 transition-colors w-max"
+                  >
+                    Baca Selengkapnya
+                    <ArrowRight className="w-3.5 h-3.5 group-hover/link:translate-x-1 transition-transform" />
+                  </Link>
                 </div>
               </div>
             </div>
