@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/components/providers/AuthProvider";
 import { QueryProvider } from "@/components/providers/QueryProvider";
+import Navbar from "@/components/public/Navbar";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -21,6 +22,8 @@ export default function RootLayout({
       <body className={inter.className}>
         <QueryProvider>
           <AuthProvider>
+            {/* 2. LETAKKAN NAVBAR DI DALAM BODY, SEBELUM CHILDREN */}
+            <Navbar />
             {/* PASTIKAN {children} HANYA ADA DI SINI. SATU KALI SAJA. */}
             {children}
           </AuthProvider>

@@ -37,7 +37,7 @@ export default async function Skills() {
         <div className="flex items-center gap-3 mb-12">
           <Wrench className="w-8 h-8 text-black" />
           <h2 className="text-3xl font-bold text-gray-900">
-            Technical Expertise
+            Technical Expertise & Soft Skills
           </h2>
         </div>
 
