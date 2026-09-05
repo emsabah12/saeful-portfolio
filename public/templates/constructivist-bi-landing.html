@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Vektor — Business Intelligence, Structured</title>
+<meta name="description" content="Vektor is a business intelligence platform for teams who read data fast: structured dashboards, instant filtering, and drill-down built on geometric clarity instead of chart junk." />
+<meta name="keywords" content="business intelligence, data analysis, dashboard, data visualization, analytics platform" />
+<meta name="robots" content="index, follow" />
+
+<meta property="og:type" content="website" />
+<meta property="og:title" content="Vektor — Business Intelligence, Structured" />
+<meta property="og:description" content="Structured dashboards, instant filtering, and drill-down built on geometric clarity instead of chart junk." />
+<meta property="og:image" content="https://picsum.photos/seed/vektor-bi/1200/630" />
+
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Vektor — Business Intelligence, Structured" />
+<meta name="twitter:description" content="Structured dashboards, instant filtering, and drill-down built on geometric clarity instead of chart junk." />
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          "deep-blue": "#005691",
+          "dark-text": "#2C3E50",
+          "teal-accent": "#20B2AA",
+          "warm-accent": "#FF8C00",
+          "purple-accent": "#8A2BE2",
+          "warn-yellow": "#FFD700",
+          "light-gray": "#ECF0F1",
+        },
+        fontFamily: {
+          mono: ['"Roboto Mono"', "monospace"],
+        },
+        borderRadius: {
+          DEFAULT: "0.5rem",
+        },
+      },
+    },
+  };
+</script>
+
+<style>
+  :root {
+    --deep-blue: #005691;
+    --white-bg: #ffffff;
+    --dark-text: #2c3e50;
+    --teal-accent: #20b2aa;
+    --warm-accent: #ff8c00;
+    --purple-accent: #8a2be2;
+    --warn-yellow: #ffd700;
+    --light-gray: #ecf0f1;
+    --border-accent: 3px solid #20b2aa;
+    --rotate-angle: 1deg;
+  }
+
+  * { font-family: "Roboto Mono", monospace; }
+
+  html { scroll-behavior: smooth; }
+
+  body { background: var(--white-bg); color: var(--dark-text); }
+
+  ::selection { background: var(--deep-blue); color: #fff; }
+
+  /* Entrance animation: fade + translate-Y, staggered cascade */
+  .reveal {
+    opacity: 0;
+    transform: translateY(16px);
+    transition: opacity 420ms ease-out, transform 420ms ease-out;
+    will-change: transform, opacity;
+  }
+  .reveal.is-visible { opacity: 1; transform: translateY(0); }
+  .stagger > * { transition-delay: calc(var(--i, 0) * 80ms); }
+
+  /* Constructivist geometry */
+  .tilt-1 { transform: rotate(var(--rotate-angle)); }
+  .tilt-neg { transform: rotate(calc(var(--rotate-angle) * -1)); }
+  .tilt-1:hover, .tilt-neg:hover { transform: rotate(0deg); }
+
+  .border-accent-r { border-right: var(--border-accent); }
+  .border-accent-l { border-left: var(--border-accent); }
+
+  /* Animated geometric data visualization */
+  .data-chart-animated .bar {
+    transform-origin: bottom;
+    transition: transform 480ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  @keyframes spin-slow { to { transform: rotate(360deg); } }
+  .spin-slow { animation: spin-slow 18s linear infinite; }
+
+  @keyframes pulse-ring {
+    0% { transform: scale(0.9); opacity: 0.6; }
+    100% { transform: scale(1.6); opacity: 0; }
+  }
+  .pulse-ring { animation: pulse-ring 2.4s ease-out infinite; }
+
+  @keyframes float-y {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+  .float-y { animation: float-y 5s ease-in-out infinite; }
+
+  /* Filter micro-interaction chips */
+  .filter-chip { transition: background-color 200ms ease, color 200ms ease, border-color 200ms ease; }
+  .filter-chip[data-active="true"] {
+    background: var(--deep-blue);
+    color: var(--teal-accent);
+    border-color: var(--deep-blue);
+  }
+
+  .btn-press:active { transform: translateY(-1px); }
+
+  .card-hover { transition: box-shadow 200ms ease, transform 200ms ease, border-color 200ms ease; }
+  .card-hover:hover { box-shadow: 0 12px 32px rgba(0, 86, 145, 0.14); transform: translateY(-4px); }
+
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .reveal, .spin-slow, .pulse-ring, .float-y, .data-chart-animated .bar { animation: none !important; transition: none !important; opacity: 1 !important; transform: none !important; }
+  }
+</style>
+</head>
+<body class="bg-white text-dark-text antialiased">
+
+<!-- ============ NAVBAR ============ -->
+<header class="sticky top-0 z-[100] bg-white/95 backdrop-blur border-b border-light-gray">
+  <nav class="max-w-[1280px] mx-auto px-6 h-16 flex items-center justify-between">
+    <a href="#top" class="flex items-center gap-2 group cursor-pointer">
+      <span class="relative w-6 h-6 shrink-0">
+        <span class="absolute inset-0 bg-deep-blue rounded-[2px] tilt-1 transition-transform"></span>
+        <span class="absolute inset-0 bg-warm-accent rounded-[2px] tilt-neg opacity-80 mix-blend-multiply"></span>
+      </span>
+      <span class="font-bold text-lg tracking-tight text-dark-text">VEKTOR</span>
+    </a>
+
+    <div class="hidden md:flex items-center gap-8 text-sm font-medium text-dark-text/70">
+      <a href="#features" class="hover:text-deep-blue transition-colors cursor-pointer">Features</a>
+      <a href="#testimonials" class="hover:text-deep-blue transition-colors cursor-pointer">Testimonials</a>
+      <a href="#pricing" class="hover:text-deep-blue transition-colors cursor-pointer">Pricing</a>
+      <a href="#faq" class="hover:text-deep-blue transition-colors cursor-pointer">FAQ</a>
+    </div>
+
+    <div class="flex items-center gap-3">
+      <a href="#pricing" class="hidden sm:inline-block text-sm font-semibold px-4 py-2 rounded border-[1.5px] border-dark-text/20 text-dark-text hover:bg-light-gray transition-all cursor-pointer">
+        Sign In
+      </a>
+      <a href="#cta" class="inline-flex items-center gap-1.5 text-sm font-semibold px-4 py-2 rounded bg-deep-blue text-teal-accent hover:brightness-110 hover:shadow-lg transition-all cursor-pointer btn-press">
+        Request Access
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+      </a>
+    </div>
+  </nav>
+</header>
+
+<main id="top">
+
+<!-- ============ HERO ============ -->
+<section class="relative overflow-hidden border-b border-light-gray">
+  <div class="max-w-[1280px] mx-auto px-6 pt-16 pb-20 lg:pt-24 lg:pb-28 grid lg:grid-cols-[1.05fr_0.95fr] gap-16 items-center min-h-[100dvh] lg:min-h-0">
+
+    <div class="reveal is-visible">
+      <span class="inline-flex items-center gap-2 text-xs font-semibold tracking-wide uppercase px-3 py-1.5 rounded border border-teal-accent/40 text-deep-blue bg-teal-accent/10">
+        <span class="w-1.5 h-1.5 rounded-full bg-teal-accent"></span>
+        Now reading live warehouse data
+      </span>
+
+      <h1 class="mt-6 font-bold tracking-tight text-dark-text" style="font-size: clamp(2.5rem, 5vw, 4rem); line-height: 1.05;">
+        Data structured
+        <span class="text-deep-blue">as argument</span>,
+        not decoration.
+      </h1>
+
+      <p class="mt-6 text-base leading-relaxed text-dark-text/70 max-w-[62ch]">
+        Vektor strips out the chart junk and the seven-color legends nobody reads.
+        What's left is your metrics, arranged with geometric precision so the number
+        that matters is impossible to miss — in the six seconds an analyst actually gives it.
+      </p>
+
+      <div class="mt-9 flex flex-wrap items-center gap-4">
+        <a href="#cta" class="inline-flex items-center gap-2 px-6 py-3 rounded bg-deep-blue text-teal-accent font-semibold hover:brightness-110 hover:-translate-y-0.5 hover:shadow-xl transition-all cursor-pointer btn-press">
+          Start Free Trial
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+        </a>
+        <a href="#features" class="inline-flex items-center gap-2 px-6 py-3 rounded border-[1.5px] border-dark-text/25 text-dark-text font-semibold hover:bg-light-gray transition-all cursor-pointer">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          Watch 2-min Demo
+        </a>
+      </div>
+
+      <div class="mt-12 flex items-center gap-8 text-dark-text/50 text-xs font-medium uppercase tracking-wide">
+        <span>Trusted by data teams at</span>
+        <span class="text-dark-text/70 font-bold">NORDLINE</span>
+        <span class="text-dark-text/70 font-bold">ATLAS&nbsp;CO</span>
+        <span class="text-dark-text/70 font-bold hidden sm:inline">PRISMA</span>
+      </div>
+    </div>
+
+    <!-- Abstract geometric / dashboard visual -->
+    <div class="relative reveal is-visible" style="transition-delay:120ms;">
+      <div class="absolute -top-10 -right-8 w-40 h-40 rounded-full border-[3px] border-teal-accent/30 spin-slow hidden sm:block" aria-hidden="true"></div>
+      <div class="absolute -bottom-10 -left-6 w-24 h-24 bg-warm-accent/20 tilt-1 rounded" aria-hidden="true"></div>
+
+      <div class="relative bg-white border border-light-gray rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.06)] p-6 border-accent-r">
+        <div class="flex items-center justify-between mb-6">
+          <div>
+            <p class="text-xs uppercase tracking-wide text-dark-text/50 font-semibold">Quarterly Revenue</p>
+            <p class="text-3xl font-bold text-dark-text mt-1">$482,910</p>
+          </div>
+          <span class="relative inline-flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded bg-teal-accent/15 text-teal-accent">
+            <span class="absolute -left-1 -top-1 w-2 h-2 rounded-full bg-teal-accent pulse-ring"></span>
+            +18.4%
+          </span>
+        </div>
+
+        <div class="data-chart-animated flex items-end gap-3 h-40 border-b border-light-gray pb-0" id="hero-chart">
+          <div class="bar flex-1 bg-deep-blue rounded-t" style="transform: scaleY(0.45)"></div>
+          <div class="bar flex-1 bg-teal-accent rounded-t" style="transform: scaleY(0.7)"></div>
+          <div class="bar flex-1 bg-warm-accent rounded-t" style="transform: scaleY(0.55)"></div>
+          <div class="bar flex-1 bg-purple-accent rounded-t" style="transform: scaleY(0.9)"></div>
+          <div class="bar flex-1 bg-deep-blue rounded-t" style="transform: scaleY(0.65)"></div>
+          <div class="bar flex-1 bg-teal-accent rounded-t" style="transform: scaleY(0.8)"></div>
+        </div>
+
+        <div class="flex flex-wrap gap-2 mt-5">
+          <button data-metric="revenue" onclick="setMetric('revenue', this)">
+            <span class="filter-chip inline-block text-xs font-semibold px-3 py-1.5 rounded border border-deep-blue" data-active="true">Revenue</span>
+          </button>
+          <button data-metric="users" onclick="setMetric('users', this)">
+            <span class="filter-chip inline-block text-xs font-semibold px-3 py-1.5 rounded border border-dark-text/20 text-dark-text/70">Active Users</span>
+          </button>
+          <button data-metric="conversion" onclick="setMetric('conversion', this)">
+            <span class="filter-chip inline-block text-xs font-semibold px-3 py-1.5 rounded border border-dark-text/20 text-dark-text/70">Conversion</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="absolute -bottom-6 -right-4 bg-dark-text text-white rounded-lg shadow-lg px-4 py-3 float-y hidden sm:block">
+        <p class="text-[10px] uppercase tracking-wide text-light-gray/60 font-semibold">Drill-down</p>
+        <p class="text-sm font-bold flex items-center gap-1.5">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#20B2AA" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+          By region → EU
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FEATURES (asymmetric) ============ -->
+<section id="features" class="border-b border-light-gray">
+  <div class="max-w-[1280px] mx-auto px-6" style="padding-top:clamp(4rem,8vw,8rem); padding-bottom:clamp(4rem,8vw,8rem);">
+    <div class="reveal max-w-[60ch] mb-14 observe">
+      <span class="text-xs font-bold uppercase tracking-wide text-warm-accent">Built for the six-second glance</span>
+      <h2 class="text-2xl md:text-4xl font-bold mt-3 text-dark-text">Every element earns its place on screen.</h2>
+      <p class="mt-4 text-dark-text/70 leading-relaxed">No ornamentation, no gratuitous gradients. Three disciplines keep a Vektor dashboard readable under pressure.</p>
+    </div>
+
+    <div class="grid md:grid-cols-3 md:grid-rows-2 gap-6">
+      <!-- Large card -->
+      <div class="observe reveal md:col-span-2 md:row-span-2 bg-white border border-light-gray rounded-lg p-8 card-hover border-accent-l">
+        <div class="w-12 h-12 rounded bg-deep-blue flex items-center justify-center mb-6">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#20B2AA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M18 17V9M13 17V5M8 17v-3"/></svg>
+        </div>
+        <h3 class="text-xl font-bold text-dark-text">Drill into any metric, instantly</h3>
+        <p class="mt-3 text-dark-text/70 leading-relaxed max-w-[52ch]">Click a bar, get a breakdown. Vektor keeps hierarchy visible at every zoom level, so going from company-wide revenue to a single region takes one click, not a new dashboard.</p>
+        <div class="mt-8 flex gap-2">
+          <span class="tilt-neg inline-block w-16 h-16 bg-teal-accent/15 rounded"></span>
+          <span class="tilt-1 inline-block w-16 h-16 bg-warm-accent/15 rounded"></span>
+          <span class="tilt-neg inline-block w-16 h-16 bg-purple-accent/15 rounded"></span>
+        </div>
+      </div>
+
+      <!-- Small card 1 -->
+      <div class="observe reveal bg-dark-text text-white rounded-lg p-7 card-hover" style="transition-delay:80ms;">
+        <div class="w-11 h-11 rounded bg-warm-accent/20 flex items-center justify-center mb-5">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FF8C00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+        </div>
+        <h3 class="text-lg font-bold">Filter without waiting</h3>
+        <p class="mt-2 text-sm text-light-gray/70 leading-relaxed">Every filter recomputes client-side. No spinner, no skeleton — the chart redraws in the same frame you click.</p>
+      </div>
+
+      <!-- Small card 2 -->
+      <div class="observe reveal bg-white border border-light-gray rounded-lg p-7 card-hover" style="transition-delay:160ms;">
+        <div class="w-11 h-11 rounded bg-purple-accent/15 flex items-center justify-center mb-5">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8A2BE2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20V10M18 20V4M6 20v-4"/></svg>
+        </div>
+        <h3 class="text-lg font-bold text-dark-text">Structured over styled</h3>
+        <p class="mt-2 text-sm text-dark-text/70 leading-relaxed">One typeface, eight colors, a fixed grid. Consistency is the feature — not a constraint on it.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ TESTIMONIALS ============ -->
+<section id="testimonials" class="border-b border-light-gray bg-light-gray/30">
+  <div class="max-w-[1280px] mx-auto px-6" style="padding-top:clamp(4rem,8vw,8rem); padding-bottom:clamp(4rem,8vw,8rem);">
+    <div class="reveal observe max-w-[60ch] mb-14">
+      <span class="text-xs font-bold uppercase tracking-wide text-purple-accent">From the teams reading it</span>
+      <h2 class="text-2xl md:text-4xl font-bold mt-3 text-dark-text">Analysts stopped exporting to spreadsheets.</h2>
+    </div>
+
+    <div class="grid md:grid-cols-3 gap-8">
+      <figure class="observe reveal tilt-neg bg-white border border-light-gray rounded-lg p-7 card-hover">
+        <blockquote class="text-dark-text/80 leading-relaxed">"We cut our weekly reporting review from forty minutes to eight. The drill-down means nobody has to ask 'can you break that down by region' in a meeting anymore."</blockquote>
+        <figcaption class="mt-6 flex items-center gap-3">
+          <img src="https://picsum.photos/seed/vektor-user1/80/80" alt="Portrait of Dana Whitfield" class="w-11 h-11 rounded object-cover" loading="lazy" />
+          <div>
+            <p class="text-sm font-bold text-dark-text">Dana Whitfield</p>
+            <p class="text-xs text-dark-text/50">Head of Analytics, Nordline</p>
+          </div>
+        </figcaption>
+      </figure>
+
+      <figure class="observe reveal tilt-1 bg-white border border-light-gray rounded-lg p-7 card-hover" style="transition-delay:80ms;">
+        <blockquote class="text-dark-text/80 leading-relaxed">"Every other BI tool we tried buried the number I needed under three tabs. Vektor's layout put it front and center by default. That's rare."</blockquote>
+        <figcaption class="mt-6 flex items-center gap-3">
+          <img src="https://picsum.photos/seed/vektor-user2/80/80" alt="Portrait of Marcus Oduya" class="w-11 h-11 rounded object-cover" loading="lazy" />
+          <div>
+            <p class="text-sm font-bold text-dark-text">Marcus Oduya</p>
+            <p class="text-xs text-dark-text/50">VP Operations, Atlas Co</p>
+          </div>
+        </figcaption>
+      </figure>
+
+      <figure class="observe reveal tilt-neg bg-white border border-light-gray rounded-lg p-7 card-hover" style="transition-delay:160ms;">
+        <blockquote class="text-dark-text/80 leading-relaxed">"Filtering feels instant even on our largest warehouse tables. Our engineers were skeptical until they saw the query plan — it's genuinely client-side."</blockquote>
+        <figcaption class="mt-6 flex items-center gap-3">
+          <img src="https://picsum.photos/seed/vektor-user3/80/80" alt="Portrait of Ines Calder" class="w-11 h-11 rounded object-cover" loading="lazy" />
+          <div>
+            <p class="text-sm font-bold text-dark-text">Ines Calder</p>
+            <p class="text-xs text-dark-text/50">Data Lead, Prisma</p>
+          </div>
+        </figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PRICING ============ -->
+<section id="pricing" class="border-b border-light-gray">
+  <div class="max-w-[1280px] mx-auto px-6" style="padding-top:clamp(4rem,8vw,8rem); padding-bottom:clamp(4rem,8vw,8rem);">
+    <div class="reveal observe max-w-[60ch] mb-14 mx-auto text-center">
+      <span class="text-xs font-bold uppercase tracking-wide text-deep-blue">Pricing</span>
+      <h2 class="text-2xl md:text-4xl font-bold mt-3 text-dark-text">One plan for every team size.</h2>
+      <p class="mt-4 text-dark-text/70">No per-seat penalty for growing. Cancel any time.</p>
+    </div>
+
+    <div class="grid md:grid-cols-3 gap-8 items-start">
+      <!-- Starter -->
+      <div class="observe reveal bg-white border border-light-gray rounded-lg p-8 card-hover">
+        <h3 class="text-sm font-bold uppercase tracking-wide text-dark-text/60">Starter</h3>
+        <p class="mt-4 text-4xl font-bold text-dark-text">$0<span class="text-base font-medium text-dark-text/50">/mo</span></p>
+        <p class="mt-2 text-sm text-dark-text/60">For evaluating on a single dataset.</p>
+        <a href="#cta" class="mt-6 block text-center px-5 py-2.5 rounded border-[1.5px] border-dark-text/20 font-semibold hover:bg-light-gray transition-all cursor-pointer">Get Started</a>
+        <ul class="mt-8 space-y-3 text-sm text-dark-text/70">
+          <li class="flex gap-2"><svg class="shrink-0 mt-0.5" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#20B2AA" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>1 dashboard</li>
+          <li class="flex gap-2"><svg class="shrink-0 mt-0.5" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#20B2AA" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>10K rows / month</li>
+          <li class="flex gap-2"><svg class="shrink-0 mt-0.5" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#20B2AA" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Community support</li>
+        </ul>
+      </div>
+
+      <!-- Team (highlighted) -->
+      <div class="observe reveal relative bg-deep-blue text-white rounded-lg p-8 shadow-2xl md:-translate-y-4 border-2 border-teal-accent">
+        <span class="absolute -top-3.5 left-1/2 -translate-x-1/2 text-xs font-bold uppercase tracking-wide px-3 py-1 rounded bg-warm-accent text-white">Most Chosen</span>
+        <h3 class="text-sm font-bold uppercase tracking-wide text-teal-accent">Team</h3>
+        <p class="mt-4 text-4xl font-bold">$79<span class="text-base font-medium text-white/60">/mo</span></p>
+        <p class="mt-2 text-sm text-white/70">For teams shipping dashboards to stakeholders.</p>
+        <a href="#cta" class="mt-6 block text-center px-5 py-2.5 rounded bg-teal-accent text-dark-text font-bold hover:brightness-110 transition-all cursor-pointer btn-press">Start Free Trial</a>
+        <ul class="mt-8 space-y-3 text-sm text-white/80">
+          <li class="flex gap-2"><svg class="shrink-0 mt-0.5" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#20B2AA" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Unlimited dashboards</li>
+          <li class="flex gap-2"><svg class="shrink-0 mt-0.5" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#20B2AA" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>5M rows / month</li>
+          <li class="flex gap-2"><svg class="shrink-0 mt-0.5" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#20B2AA" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Role-based access</li>
+          <li class="flex gap-2"><svg class="shrink-0 mt-0.5" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#20B2AA" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Priority support</li>
+        </ul>
+      </div>
+
+      <!-- Enterprise -->
+      <div class="observe reveal bg-white border border-light-gray rounded-lg p-8 card-hover">
+        <h3 class="text-sm font-bold uppercase tracking-wide text-dark-text/60">Enterprise</h3>
+        <p class="mt-4 text-4xl font-bold text-dark-text">Custom</p>
+        <p class="mt-2 text-sm text-dark-text/60">For organizations with governance needs.</p>
+        <a href="#cta" class="mt-6 block text-center px-5 py-2.5 rounded border-[1.5px] border-dark-text/20 font-semibold hover:bg-light-gray transition-all cursor-pointer">Contact Sales</a>
+        <ul class="mt-8 space-y-3 text-sm text-dark-text/70">
+          <li class="flex gap-2"><svg class="shrink-0 mt-0.5" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#20B2AA" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Unlimited rows</li>
+          <li class="flex gap-2"><svg class="shrink-0 mt-0.5" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#20B2AA" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>SSO &amp; audit logs</li>
+          <li class="flex gap-2"><svg class="shrink-0 mt-0.5" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#20B2AA" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Dedicated success manager</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FINAL CTA ============ -->
+<section id="cta" class="relative overflow-hidden bg-dark-text text-white">
+  <div class="absolute inset-0 opacity-[0.06] pointer-events-none" aria-hidden="true"
+       style="background-image: repeating-linear-gradient(45deg, #20B2AA 0, #20B2AA 2px, transparent 2px, transparent 26px);"></div>
+  <div class="relative max-w-[1280px] mx-auto px-6 text-center" style="padding-top:clamp(4rem,8vw,8rem); padding-bottom:clamp(4rem,8vw,8rem);">
+    <h2 class="reveal observe font-bold" style="font-size: clamp(2rem, 4vw, 3rem);">Put your metrics in order.</h2>
+    <p class="reveal observe mt-5 text-white/70 max-w-[52ch] mx-auto" style="transition-delay:80ms;">Fourteen days, full feature access, no card required. Import a CSV or connect your warehouse in under five minutes.</p>
+    <div class="reveal observe mt-9 flex flex-wrap justify-center gap-4" style="transition-delay:160ms;">
+      <a href="#" class="inline-flex items-center gap-2 px-7 py-3.5 rounded bg-teal-accent text-dark-text font-bold hover:brightness-110 hover:-translate-y-0.5 hover:shadow-xl transition-all cursor-pointer btn-press">
+        Start Free Trial
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+      </a>
+      <a href="#" class="inline-flex items-center gap-2 px-7 py-3.5 rounded border-[1.5px] border-white/30 text-white font-semibold hover:bg-white/10 transition-all cursor-pointer">
+        Talk to Sales
+      </a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- ============ FOOTER ============ -->
+<footer class="bg-[#1A2530] text-light-gray/80">
+  <div class="max-w-[1280px] mx-auto px-6 py-16 grid gap-10 sm:grid-cols-2 lg:grid-cols-5">
+    <div class="lg:col-span-2">
+      <a href="#top" class="flex items-center gap-2 cursor-pointer">
+        <span class="relative w-6 h-6 shrink-0">
+          <span class="absolute inset-0 bg-teal-accent rounded-[2px] tilt-1"></span>
+          <span class="absolute inset-0 bg-warm-accent rounded-[2px] tilt-neg opacity-80 mix-blend-multiply"></span>
+        </span>
+        <span class="font-bold text-lg text-white">VEKTOR</span>
+      </a>
+      <p class="mt-4 text-sm leading-relaxed max-w-[36ch] text-light-gray/60">Business intelligence with the ornamentation stripped away. Structure, not decoration.</p>
+
+      <div class="mt-6 flex items-center gap-3">
+        <a href="#" aria-label="Vektor on X" class="w-9 h-9 rounded flex items-center justify-center border border-white/10 hover:border-teal-accent hover:text-teal-accent transition-all cursor-pointer">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M18.9 2H22l-7.6 8.7L23.3 22H16.9l-5-6.5L6 22H2.9l8.1-9.3L1.7 2h6.6l4.5 6ZM17.6 20h1.7L7.5 4H5.6Z"/></svg>
+        </a>
+        <a href="#" aria-label="Vektor on LinkedIn" class="w-9 h-9 rounded flex items-center justify-center border border-white/10 hover:border-teal-accent hover:text-teal-accent transition-all cursor-pointer">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M20.45 20.45h-3.56v-5.58c0-1.33-.03-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.68H9.34V9h3.42v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.45zM5.34 7.43a2.07 2.07 0 1 1 0-4.14 2.07 2.07 0 0 1 0 4.14zM7.12 20.45H3.56V9h3.56z"/></svg>
+        </a>
+        <a href="#" aria-label="Vektor on GitHub" class="w-9 h-9 rounded flex items-center justify-center border border-white/10 hover:border-teal-accent hover:text-teal-accent transition-all cursor-pointer">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5A11.5 11.5 0 0 0 .5 12c0 5.1 3.29 9.43 7.86 10.96.57.1.78-.25.78-.55v-2.14c-3.2.7-3.87-1.36-3.87-1.36-.53-1.34-1.29-1.7-1.29-1.7-1.05-.72.08-.7.08-.7 1.16.08 1.78 1.2 1.78 1.2 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.56-.29-5.25-1.28-5.25-5.71 0-1.26.45-2.29 1.19-3.1-.12-.29-.52-1.47.11-3.06 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.79 0c2.2-1.5 3.18-1.18 3.18-1.18.63 1.6.23 2.77.11 3.06.74.81 1.19 1.84 1.19 3.1 0 4.44-2.7 5.42-5.27 5.7.41.36.78 1.07.78 2.16v3.2c0 .3.2.66.79.55A11.5 11.5 0 0 0 23.5 12 11.5 11.5 0 0 0 12 .5Z"/></svg>
+        </a>
+      </div>
+    </div>
+
+    <div>
+      <p class="text-xs font-bold uppercase tracking-wide text-white/50 mb-4">Product</p>
+      <ul class="space-y-3 text-sm">
+        <li><a href="#features" class="hover:text-teal-accent transition-colors cursor-pointer">Features</a></li>
+        <li><a href="#pricing" class="hover:text-teal-accent transition-colors cursor-pointer">Pricing</a></li>
+        <li><a href="#" class="hover:text-teal-accent transition-colors cursor-pointer">Changelog</a></li>
+        <li><a href="#" class="hover:text-teal-accent transition-colors cursor-pointer">Integrations</a></li>
+      </ul>
+    </div>
+
+    <div>
+      <p class="text-xs font-bold uppercase tracking-wide text-white/50 mb-4">Company</p>
+      <ul class="space-y-3 text-sm">
+        <li><a href="#" class="hover:text-teal-accent transition-colors cursor-pointer">About</a></li>
+        <li><a href="#" class="hover:text-teal-accent transition-colors cursor-pointer">Careers</a></li>
+        <li><a href="#" class="hover:text-teal-accent transition-colors cursor-pointer">Blog</a></li>
+        <li><a href="#" class="hover:text-teal-accent transition-colors cursor-pointer">Sitemap</a></li>
+      </ul>
+    </div>
+
+    <div>
+      <p class="text-xs font-bold uppercase tracking-wide text-white/50 mb-4">Legal &amp; Contact</p>
+      <ul class="space-y-3 text-sm">
+        <li><a href="#" class="hover:text-teal-accent transition-colors cursor-pointer">Privacy Policy</a></li>
+        <li><a href="#" class="hover:text-teal-accent transition-colors cursor-pointer">Terms of Use</a></li>
+        <li><a href="mailto:hello@vektor.example" class="hover:text-teal-accent transition-colors cursor-pointer">hello@vektor.example</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="border-t border-white/10">
+    <div class="max-w-[1280px] mx-auto px-6 py-6 flex flex-col sm:flex-row gap-3 items-center justify-between text-xs text-light-gray/50">
+      <p>&copy; 2026 Vektor Inc. All rights reserved.</p>
+      <div class="flex gap-5">
+        <a href="#" class="hover:text-teal-accent transition-colors cursor-pointer">Privacy Policy</a>
+        <a href="#" class="hover:text-teal-accent transition-colors cursor-pointer">Terms of Use</a>
+        <a href="#" class="hover:text-teal-accent transition-colors cursor-pointer">Contact</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Staggered scroll-reveal entrance animations
+  document.querySelectorAll('.observe').forEach((el, i) => {
+    el.classList.remove('is-visible');
+    el.style.transitionDelay = el.style.transitionDelay || `${(i % 6) * 80}ms`;
+  });
+
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('is-visible');
+        io.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.15 });
+
+  document.querySelectorAll('.observe').forEach((el) => io.observe(el));
+
+  // Filter / drill-down micro-interaction: swap hero chart data by metric
+  const chartData = {
+    revenue:    [0.45, 0.7, 0.55, 0.9, 0.65, 0.8],
+    users:      [0.3, 0.5, 0.85, 0.4, 0.7, 0.6],
+    conversion: [0.6, 0.4, 0.5, 0.75, 0.3, 0.55],
+  };
+
+  function setMetric(metric, btn) {
+    const chips = document.querySelectorAll('.filter-chip');
+    chips.forEach((c) => c.setAttribute('data-active', 'false'));
+    btn.querySelector('.filter-chip').setAttribute('data-active', 'true');
+
+    const bars = document.querySelectorAll('#hero-chart .bar');
+    const values = chartData[metric] || chartData.revenue;
+    bars.forEach((bar, i) => {
+      bar.style.transform = `scaleY(${values[i]})`;
+    });
+  }
+</script>
+
+</body>
+</html>
