@@ -75,6 +75,16 @@
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/admin/experiences/page.js"
+    ],
+    "/api/admin/ai-refiner/route": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/api/admin/ai-refiner/route.js"
+    ],
+    "/api/admin/analytics/route": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/api/admin/analytics/route.js"
     ]
   }
 }

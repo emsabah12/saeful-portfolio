@@ -1,8 +1,9 @@
 {
-  "/sitemap.xml/route": "app/sitemap.xml/route.js",
-  "/admin/dashboard/page": "app/admin/dashboard/page.js",
+  "/api/admin/analytics/route": "app/api/admin/analytics/route.js",
   "/admin/posts/page": "app/admin/posts/page.js",
   "/admin/messages/page": "app/admin/messages/page.js",
-  "/admin/projects/page": "app/admin/projects/page.js",
+  "/(public)/page": "app/(public)/page.js",
+  "/(public)/blog/page": "app/(public)/blog/page.js",
+  "/admin/dashboard/page": "app/admin/dashboard/page.js",
   "/admin/experiences/page": "app/admin/experiences/page.js"
 }
