@@ -2,11 +2,8 @@ import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
 /**
- * Memperbarui dan menyegarkan (refresh) sesi autentikasi Supabase via Cookie HTTP.
- * Memastikan sesi pengguna tetap aktif dan token JWT tidak kedaluwarsa.
- * 
- * @param request - Request objek dari Next.js Middleware
- * @returns Objek berisi NextResponse dan data User yang terverifikasi
+ * Memperbarui dan menyegarkan (refresh) sesi autentikasi Supabase via Cookie HTTP,
+ * sekaligus mengontrol proteksi rute /admin/* (Route Guard).
  */
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
@@ -36,10 +33,28 @@ export async function updateSession(request: NextRequest) {
     }
   );
 
-  // Menyegarkan token JWT dan mengambil data pengguna terverifikasi
+  // Verifikasi sesi pengguna aktual dari Supabase Auth
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
-  return { response: supabaseResponse, user };
+  const pathname = request.nextUrl.pathname;
+
+  // 1. Jika mencoba mengakses rute /admin (selain /admin/login) dan BELUM login
+  if (pathname.startsWith("/admin") && !pathname.startsWith("/admin/login")) {
+    if (!user) {
+      const url = request.nextUrl.clone();
+      url.pathname = "/admin/login";
+      return NextResponse.redirect(url);
+    }
+  }
+
+  // 2. Jika SUDAH login dan mencoba membuka rute /admin/login
+  if (pathname.startsWith("/admin/login") && user) {
+    const url = request.nextUrl.clone();
+    url.pathname = "/admin/dashboard";
+    return NextResponse.redirect(url);
+  }
+
+  return supabaseResponse;
 }
